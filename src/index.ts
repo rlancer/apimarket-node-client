@@ -4,14 +4,13 @@ import jsonwebtoken from 'jsonwebtoken'
 import { inspect } from 'util'
 import shortid from 'shortid'
 
-
 const handleError = (error: any) => {
   if (error.response) {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
     console.log(inspect(error.response.data, false, 10, true))
     console.log(error.response.status)
-    console.log(error.response.headers)
+    // console.log(error.response.headers)
 
     throw error.response.data
   } else if (error.request) {
@@ -32,7 +31,6 @@ export function formatPhone(phone: string): string {
   const formattedPhone = phone.replace(/[\.\-\s]/g, '')
 
   if (/^\+[1-9]\d{4,14}$/.test(formattedPhone)) {
-    console.log('phone valid', formattedPhone)
     return formattedPhone
   } else {
     if (!formattedPhone.startsWith('+1')) {
@@ -75,39 +73,95 @@ type TGetChannelsResponse = {
 const BASEURL_WS = 'wss://oauth-cpaas.att.com'
 const BASEURL = 'https://oauth-cpaas.att.com/cpaas'
 
+type TAuthenticateProject = {
+  grant_type: string
+  client_secret: string
+  client_id: string
+  scope: string
+}
+
+type TAuthenticateUser = {
+  username: string
+  password: string
+  grant_type: string
+  client_id: string
+  scope: string
+}
+
+type TJWT = {
+  jti: string
+  exp: number
+  nbf: number
+  iat: number
+  iss: string
+  aud: string
+  sub: string
+  typ: string
+  azp: string
+  auth_time: number
+  session_state
+  acr
+  clientId
+  email_verified
+  clientHost
+  preferred_username
+  clientAddress
+  email
+}
+
+type TAuthConfig = TAuthenticateProject | TAuthenticateUser
+
 class APIMarketplaceClient {
 
   private id_token?: string | null
   private access_token?: string | null
-  private decodedToken: any
-  private authResponse: any
+  private decodedToken?: TJWT
+  private authResponse?: any
+  private authConfig: TAuthConfig
 
-
-  public async authenticateUser({ username, password, grant_type, client_id, scope }: { username: string, password: string, grant_type: string, client_id: string, scope: string }) {
-    this.authResponse = await axios.post('https://oauth-cpaas.att.com/cpaas/auth/v1/token', querystring.stringify({
-      username,
-      password,
-      grant_type,
-      client_id,
-      scope
-    }))
-    return this.decodeAuthToken()
+  private get preferred_username(): string {
+    return (this.decodedToken as TJWT).preferred_username
   }
 
-  public async authenticateProject({ grant_type, client_id, client_secret, scope }: { grant_type: string, client_secret: string, client_id: string, scope: string }) {
-    this.authResponse = await axios.post('https://oauth-cpaas.att.com/cpaas/auth/v1/token', querystring.stringify({
-        grant_type,
-        client_id,
-        client_secret,
-        scope
-      }),
+  public constructor(config: TAuthConfig) {
+    this.authConfig = config
+  }
+
+
+  private preRequest() {
+    return this.getValidToken()
+  }
+
+  public async getValidToken() {
+
+    if (this.decodedToken) {
+
+      const timeleft = (this.decodedToken.exp * 1000) - (new Date()).getTime()
+
+//      console.log('time left on token', timeleft)
+
+      if (timeleft < 5000) {
+        return await this.forceGetTokens()
+      } else {
+        //      console.log('No need to refresh token')
+        return { id_token: this.id_token, access_token: this.access_token, id_token_decoded: this.decodedToken }
+      }
+
+    } else {
+      return await this.forceGetTokens()
+    }
+  }
+
+  public async forceGetTokens() {
+    console.log('forging fetch of new token')
+    this.authResponse = await axios.post('https://oauth-cpaas.att.com/cpaas/auth/v1/token', querystring.stringify(this.authConfig),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
-      })
+      }
+    )
     return this.decodeAuthToken()
-
   }
 
   private decodeAuthToken() {
@@ -115,15 +169,13 @@ class APIMarketplaceClient {
     this.id_token = id_token
     this.access_token = access_token
     this.decodedToken = jsonwebtoken.decode(id_token) as any
-
     return { id_token, access_token, id_token_decoded: this.decodedToken }
   }
 
   async getInboundSMSSubscriptions() {
-    //
+    await this.preRequest()
 
-    const { preferred_username } = this.decodedToken
-    const resp = await axios.get(`${BASEURL}/smsmessaging/v1/${preferred_username}/inbound/subscriptions`, {
+    const resp = await axios.get(`${BASEURL}/smsmessaging/v1/${this.preferred_username}/inbound/subscriptions`, {
       headers: {
         Authorization: `Bearer ${this.access_token}`
       }
@@ -133,8 +185,11 @@ class APIMarketplaceClient {
   }
 
   async getSMSHistory() {
-    const { preferred_username } = this.decodedToken
-    const resp = await axios.get(`${BASEURL}/smsmessaging/v1/${preferred_username}/remoteAddresses?max=50`, {
+
+    await this.preRequest()
+
+
+    const resp = await axios.get(`${BASEURL}/smsmessaging/v1/${this.preferred_username}/remoteAddresses?max=50`, {
       headers: {
         Authorization: `Bearer ${this.access_token}`
       }
@@ -143,12 +198,11 @@ class APIMarketplaceClient {
     return resp.data
   }
 
-  async createChannel({ clientCorrelator, xWebhookURL = '', xAuthorization }: { clientCorrelator: string, xWebhookURL?: string, xAuthorization: string }) {
+  async createChannel({ clientCorrelator, xWebhookURL = '', xAuthorization = '' }: { clientCorrelator: string, xWebhookURL?: string, xAuthorization?: string }) {
+    await this.preRequest()
 
     try {
-
-      const { preferred_username } = this.decodedToken
-      const resp = await axios.post(`${BASEURL}/notificationchannel/v1/${preferred_username}/channels`, {
+      const resp = await axios.post(`${BASEURL}/notificationchannel/v1/${this.preferred_username}/channels`, {
         'notificationChannel': {
           channelData: {
             'x-webhookURL': xWebhookURL,
@@ -168,13 +222,15 @@ class APIMarketplaceClient {
       return data
     } catch (error) {
       handleError(error)
+      throw error
     }
   }
 
 
   async getChannels(): Promise<TGetChannelsResponse> {
-    const { preferred_username } = this.decodedToken
-    const resp = await axios.get(`${BASEURL}/notificationchannel/v1/${preferred_username}/channels`, {
+    await this.preRequest()
+
+    const resp = await axios.get(`${BASEURL}/notificationchannel/v1/${this.preferred_username}/channels`, {
       headers: {
         Authorization: `Bearer ${this.access_token}`
       }
@@ -184,10 +240,11 @@ class APIMarketplaceClient {
   }
 
   async sendSMS({ toAddress, fromAddress, message, clientCorrelator }: { toAddress: string, fromAddress: string, message: string, clientCorrelator: string }) {
-    try {
-      const { preferred_username } = this.decodedToken
+    await this.preRequest()
 
-      const txt = await axios.post(`${BASEURL}/smsmessaging/v1/${preferred_username}/outbound/${fromAddress}/requests`, {
+    try {
+
+      const txt = await axios.post(`${BASEURL}/smsmessaging/v1/${this.preferred_username}/outbound/${fromAddress}/requests`, {
 
           outboundSMSMessageRequest: {
             address: [toAddress],
@@ -206,10 +263,13 @@ class APIMarketplaceClient {
       return txt.data
     } catch (error) {
       handleError(error)
+      throw error
     }
   }
 
   async simpleSmsSend({ toAddress, fromAddress, message, callbackUrl = '' }: { fromAddress: string, toAddress: string, message: string, callbackUrl?: string }) {
+
+    await this.preRequest()
 
     const channels = await this.getChannels()
 

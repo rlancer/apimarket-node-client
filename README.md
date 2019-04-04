@@ -6,7 +6,6 @@ AT&T API Marketplace - Community Nodejs Client
 Get started with the new API Marketplace at 
 https://apimarket.att.com
 
-
 ## Install 
 `$ npm i @collaborizm/apimarket`
 
@@ -14,41 +13,35 @@ Built with Typescript, types included!
 
 ## Authentication
  ```javascript
-
   import { APIMarketplaceClient } from '@collaborizm/apimarket'
 
-  const apiMarketplaceClient = new APIMarketplaceClient()
+  // for user authentication 
+  const apiMarketplaceClient = new APIMarketplaceClient({
+                                                            username: '<USERNAME>',
+                                                            password: '<PASSWORD>',
+                                                            grant_type: 'password',
+                                                            client_id: '<CLIENT_ID>',
+                                                            scope: 'openid'
+                                                          })
   
-  const authenticateUser = await apiMarketplaceClient.authenticateUser({
-    username: '<USERNAME>',
-    password: '<PASSWORD>',
-    grant_type: 'password',
-    client_id: '<CLIENT_ID>',
-    scope: 'openid'
-  })
-
-  const authenticateProject = await apiMarketplaceClient.authenticateUser({
-    username: '<USERNAME>',
-    password: '<PASSWORD>',
-    grant_type: 'password',
-    client_id: '<CLIENT_ID>',
-    scope: 'openid'
-  })
-    
+  // for project authentication                                                           
+  const apiMarketplaceClient = new APIMarketplaceClient({
+                                                            username: '<USERNAME>',
+                                                            password: '<PASSWORD>',
+                                                            grant_type: 'password',
+                                                            client_id: '<CLIENT_ID>',
+                                                            scope: 'openid'
+                                                          })
+  
   // returns and object { id_token, access_token, id_token_decoded})          
 ``` 
 
 ## Usage with API Marketplace Javascript SDK
 ```javascript
+
 // Execute authentication on server
   
-const authenticateProject = await apiMarketplaceClient.authenticateUser({
-     username: '<USERNAME>',
-     password: '<PASSWORD>',
-     grant_type: 'password',
-     client_id: '<CLIENT_ID>',
-     scope: 'openid'
-    })
+const tokenFromServer = await apiMarketplaceClient.getValidToken() // getValidToken will automatically refresh your access token if it's about to expire
 
 
  // Include JS SDK included on client  
@@ -66,7 +59,7 @@ const authenticateProject = await apiMarketplaceClient.authenticateUser({
   }
 })
 
-const { id_token, access_token } = value_from_server
+const { id_token, access_token } = authenticateProject
 
 this.kandy.setTokens({ idToken: id_token, accessToken: access_token })
 ``` 
