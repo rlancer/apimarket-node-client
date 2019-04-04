@@ -99,14 +99,14 @@ type TJWT = {
   typ: string
   azp: string
   auth_time: number
-  session_state
-  acr
-  clientId
-  email_verified
-  clientHost
-  preferred_username
-  clientAddress
-  email
+  session_state: any
+  acr: any
+  clientId: any
+  email_verified: any
+  clientHost: any
+  preferred_username: any
+  clientAddress: any
+  email: any
 }
 
 type TAuthConfig = TAuthenticateProject | TAuthenticateUser
