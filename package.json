@@ -1,0 +1,28 @@
+{
+  "name": "@collaborizm/apimarket",
+  "version": "0.0.1",
+  "description": "Community supported, client library for AT&T API Marketplace",
+  "main": "out/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jsonwebtoken": "^8.3.2",
+    "@types/uuid": "^3.4.4",
+    "@types/node": "^11.11.4",
+    "@types/shortid": "0.0.29",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.4000"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "jsonwebtoken": "^8.5.1",
+    "querystring": "^0.2.0",
+    "shortid": "^2.2.14",
+    "uuid": "^3.3.2"
+  }
+}
