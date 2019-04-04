@@ -2,6 +2,7 @@ import axios from 'axios'
 import querystring from 'querystring'
 import jsonwebtoken from 'jsonwebtoken'
 import { inspect } from 'util'
+import shortid from 'shortid'
 
 
 const handleError = (error: any) => {
@@ -59,7 +60,7 @@ type TNotificationChannel = {
   'x-connCheckRole': 'server' | 'client'
 }
 
-type  TGetChanelResponse = {
+type  TGetChannelResponse = {
   notificationChannel: TNotificationChannel
 }
 
@@ -142,7 +143,7 @@ class APIMarketplaceClient {
     return resp.data
   }
 
-  async createChanel({ clientCorrelator, xWebhookURL, xAuthorization }: { clientCorrelator: string, xWebhookURL: string, xAuthorization: string }) {
+  async createChannel({ clientCorrelator, xWebhookURL = '', xAuthorization }: { clientCorrelator: string, xWebhookURL?: string, xAuthorization: string }) {
 
     try {
 
@@ -163,7 +164,7 @@ class APIMarketplaceClient {
         }
       })
 
-      const data: TGetChanelResponse = resp.data
+      const data: TGetChannelResponse = resp.data
       return data
     } catch (error) {
       handleError(error)
@@ -171,7 +172,7 @@ class APIMarketplaceClient {
   }
 
 
-  async getChanels(): Promise<TGetChannelsResponse> {
+  async getChannels(): Promise<TGetChannelsResponse> {
     const { preferred_username } = this.decodedToken
     const resp = await axios.get(`${BASEURL}/notificationchannel/v1/${preferred_username}/channels`, {
       headers: {
@@ -206,6 +207,29 @@ class APIMarketplaceClient {
     } catch (error) {
       handleError(error)
     }
+  }
+
+  async simpleSmsSend({ toAddress, fromAddress, message, callbackUrl = '' }: { fromAddress: string, toAddress: string, message: string, callbackUrl?: string }) {
+
+    const channels = await this.getChannels()
+
+    let clientCorrelator
+
+    // should see if callbackurl matches
+    if (channels.notificationChannelList.notificationChannel.length > 0) {
+      clientCorrelator = channels.notificationChannelList.notificationChannel[0].clientCorrelator
+
+    } else {
+      clientCorrelator = shortid.generate()
+
+      const createChan = await this.createChannel({
+        clientCorrelator: clientCorrelator,
+        xAuthorization: '',
+        xWebhookURL: callbackUrl
+      })
+    }
+
+    this.sendSMS({ clientCorrelator, fromAddress, toAddress, message })
   }
 }
 
