@@ -18,21 +18,21 @@ Library automatically refreshes access tokens, no need to worry about testing fo
 
   // for user authentication 
   const apiMarketplaceClient = new APIMarketplaceClient({
-                                                            username: '<USERNAME>',
-                                                            password: '<PASSWORD>',
-                                                            grant_type: 'password',
-                                                            client_id: '<CLIENT_ID>',
-                                                            scope: 'openid'
-                                                          })
+                                    username: '<USERNAME>',
+                                    password: '<PASSWORD>',
+                                    grant_type: 'password',
+                                    client_id: '<CLIENT_ID>',
+                                    scope: 'openid'
+                                  })
   
   // for project authentication                                                           
   const apiMarketplaceClient = new APIMarketplaceClient({
-                                                            username: '<USERNAME>',
-                                                            password: '<PASSWORD>',
-                                                            grant_type: 'password',
-                                                            client_id: '<CLIENT_ID>',
-                                                            scope: 'openid'
-                                                          })
+                                    username: '<USERNAME>',
+                                    password: '<PASSWORD>',
+                                    grant_type: 'password',
+                                    client_id: '<CLIENT_ID>',
+                                    scope: 'openid'
+                                  })
   
   // returns and object { id_token, access_token, id_token_decoded})          
 ``` 
