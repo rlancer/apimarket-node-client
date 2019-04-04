@@ -9,9 +9,10 @@ https://apimarket.att.com
 ## Install 
 `$ npm i @collaborizm/apimarket`
 
-Built with Typescript, types included!
+Built with Typescript, types included! 
 
 ## Authentication
+Library automatically refreshes access tokens, no need to worry about testing for token experation.
  ```javascript
   import { APIMarketplaceClient } from '@collaborizm/apimarket'
 
