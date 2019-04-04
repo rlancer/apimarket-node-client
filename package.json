@@ -8,9 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
+  "license": "MIT",
+  "private": false,
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Collaborizm Community",
   "devDependencies": {
     "@types/jsonwebtoken": "^8.3.2",
     "@types/uuid": "^3.4.4",
