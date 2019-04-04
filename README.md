@@ -78,13 +78,14 @@ Creates a communication channel if one doesn't exist and sends an SMS
 ```
 
 ## REST API Methods 
-Creates a communication channel if one doesn't exist and sends an SMS 
+If you'd like to use any of the standard REST api methods, they're all here too
+
 ```javascript
-  await apiMarketplaceClient.simpleSmsSend({
+  await apiMarketplaceClient.sendSMS({
     toAddress: '+15555555555',
     fromAddress: '<ADDRESS_MUST_BE_PROVISIONED>',
     message: 'Hey',
-    callbackUrl: 'http://example.com/callback'
+    clientCorrelator: '<FROM COMMUNICATION CHANNEL>'
   })
 ```
 
