@@ -39,7 +39,7 @@ Built with Typescript, types included!
 ``` 
 
 # Usage with API Marketplace Javascript SDK
-```
+```javascript
  
  
  // Execute authentication on server
