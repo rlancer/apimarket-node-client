@@ -45,12 +45,8 @@ Library automatically refreshes access tokens, no need to worry about testing fo
 // getValidToken will automatically refresh your access token if it's about to expire  
 const tokenFromServer = await apiMarketplaceClient.getValidToken() 
 
-
-
- // Include JS SDK included on client  
- 
- const kandy = Kandy.create({
-      
+// Include JS SDK included on client  
+const kandy = Kandy.create({
   logs: {
     logLevel: 'debug'
   },
