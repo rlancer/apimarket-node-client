@@ -40,8 +40,10 @@ Built with Typescript, types included!
 ```javascript
 
 // Execute authentication on server
-  
-const tokenFromServer = await apiMarketplaceClient.getValidToken() // getValidToken will automatically refresh your access token if it's about to expire
+
+// getValidToken will automatically refresh your access token if it's about to expire  
+const tokenFromServer = await apiMarketplaceClient.getValidToken() 
+
 
 
  // Include JS SDK included on client  
@@ -65,6 +67,17 @@ this.kandy.setTokens({ idToken: id_token, accessToken: access_token })
 ``` 
 
 ## Simple send SMS message 
+Creates a communication channel if one doesn't exist and sends an SMS 
+```javascript
+  await apiMarketplaceClient.simpleSmsSend({
+    toAddress: '+15555555555',
+    fromAddress: '<ADDRESS_MUST_BE_PROVISIONED>',
+    message: 'Hey',
+    callbackUrl: 'http://example.com/callback'
+  })
+```
+
+## REST API Methods 
 Creates a communication channel if one doesn't exist and sends an SMS 
 ```javascript
   await apiMarketplaceClient.simpleSmsSend({
