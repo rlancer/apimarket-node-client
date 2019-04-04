@@ -129,10 +129,10 @@ class APIMarketplaceClient {
 
 
   private preRequest() {
-    return this.getValidToken()
+    return this.getTokensAndRefreshIfNeeded()
   }
 
-  public async getValidToken() {
+  public async getTokensAndRefreshIfNeeded() {
 
     if (this.decodedToken) {
 
