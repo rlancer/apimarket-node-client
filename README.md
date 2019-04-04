@@ -8,33 +8,36 @@ https://apimarket.att.com
 
 
 ## Install 
-> $ npm i @collaborizm/apimarket
+`$ npm i @collaborizm/apimarket`
 
+Built with Typescript, types included!
 
 ## Authentication
  ```javascript
 
-      const apiMarketplaceClient = new APIMarketplaceClient()
-      
-      const authenticateUser = await apiMarketplaceClient.authenticateUser({
-        username: '<USERNAME>',
-        password: '<PASSWORD>',
-        grant_type: 'password',
-        client_id: '<CLIENT_ID>',
-        scope: 'openid'
-      })
+  import { APIMarketplaceClient } from '@collaborizm/apimarket'
 
-      
+  const apiMarketplaceClient = new APIMarketplaceClient()
+  
+  const authenticateUser = await apiMarketplaceClient.authenticateUser({
+    username: '<USERNAME>',
+    password: '<PASSWORD>',
+    grant_type: 'password',
+    client_id: '<CLIENT_ID>',
+    scope: 'openid'
+  })
 
-      const authenticateProject = await apiMarketplaceClient.authenticateUser({
-        username: '<USERNAME>',
-        password: '<PASSWORD>',
-        grant_type: 'password',
-        client_id: '<CLIENT_ID>',
-        scope: 'openid'
-      })
-      
-      
-      // returns and object { id_token, access_token, id_token_decoded})
+  
+
+  const authenticateProject = await apiMarketplaceClient.authenticateUser({
+    username: '<USERNAME>',
+    password: '<PASSWORD>',
+    grant_type: 'password',
+    client_id: '<CLIENT_ID>',
+    scope: 'openid'
+  })
+  
+  
+  // returns and object { id_token, access_token, id_token_decoded})
            
 ``` 

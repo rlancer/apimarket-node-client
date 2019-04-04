@@ -1,6 +1,6 @@
 {
   "name": "@collaborizm/apimarket",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Community supported, client library for AT&T API Marketplace",
   "repository": "https://gitlab.com/collaborizm-community/node-apimarketplace-client",
   "main": "out/index.js",
