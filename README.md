@@ -10,15 +10,8 @@ https://apimarket.att.com
 ## Install 
 > $ npm i @collaborizm/apimarket
 
-import { APIMarketplaceClient } from '@collaborizm/apimarket'
 
-type TProps = {
-  user1: TVideoChatProps
-  user2: TVideoChatProps
-}
-export default class Kandy extends Component <TProps, {}> {
-
-## Useage
+## Authentication
  ```javascript
 
       const apiMarketplaceClient = new APIMarketplaceClient()
@@ -42,4 +35,6 @@ export default class Kandy extends Component <TProps, {}> {
       })
       
       
+      // returns and object { id_token, access_token, id_token_decoded})
+           
 ``` 
