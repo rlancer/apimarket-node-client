@@ -27,10 +27,9 @@ Library automatically refreshes access tokens, no need to worry about testing fo
   
   // for project authentication                                                           
   const apiMarketplaceClient = new APIMarketplaceClient({
-                                    username: '<USERNAME>',
-                                    password: '<PASSWORD>',
-                                    grant_type: 'password',
+                                    grant_type: 'client_credentials',
                                     client_id: '<CLIENT_ID>',
+                                    client_secret: '<CLIENT_SECRET>',
                                     scope: 'openid'
                                   })
   
