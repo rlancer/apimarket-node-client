@@ -2,7 +2,7 @@
   "name": "@collaborizm/apimarket",
   "version": "0.0.7",
   "description": "Community supported, client library for AT&T API Marketplace",
-  "repository": "https://gitlab.com/collaborizm-community/node-apimarketplace-client",
+  "repository": "https://github.com/rlancer/apimarket-node-client",
   "main": "out/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
