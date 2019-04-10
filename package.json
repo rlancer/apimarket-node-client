@@ -5,7 +5,7 @@
   "repository": "https://github.com/rlancer/apimarket-node-client",
   "main": "out/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo NO TEST",
     "build": "tsc",
     "prepublish": "rm -rf out && tsc"
   },
