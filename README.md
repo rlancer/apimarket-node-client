@@ -12,7 +12,7 @@ https://apimarket.att.com
 Built with Typescript, types included! 
 
 ## Authentication
-Library automatically refreshes access tokens, no need to worry about testing for token experation.
+Library automatically refreshes access tokens, no need to worry about testing for token expiration.
  ```javascript
   import { APIMarketplaceClient } from '@collaborizm/apimarket'
 
