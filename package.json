@@ -11,7 +11,7 @@
   },
   "license": "MIT",
   "private": false,
-  "keywords": [],
+  "keywords": ["att", "apimarketplace", "kandy", "collaborizm", "cpaas" ],
   "author": "Collaborizm Community",
   "devDependencies": {
     "@types/jsonwebtoken": "^8.3.2",
