@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo NO TEST",
     "build": "tsc",
-    "prepublish": "rm -rf out && tsc"
+    "prepare": "rm -rf out && tsc"
   },
   "license": "MIT",
   "private": false,
@@ -31,7 +31,6 @@
     "axios": "^0.18.0",
     "jsonwebtoken": "^8.5.1",
     "querystring": "^0.2.0",
-    "shortid": "^2.2.14",
-    "uuid": "^3.3.2"
+    "shortid": "^2.2.14"
   }
 }
