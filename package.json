@@ -1,6 +1,6 @@
 {
   "name": "@collaborizm/apimarket",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Community supported, client library for AT&T API Marketplace",
   "repository": "https://github.com/rlancer/apimarket-node-client",
   "main": "out/index.js",
@@ -11,7 +11,13 @@
   },
   "license": "MIT",
   "private": false,
-  "keywords": ["att", "apimarketplace", "kandy", "collaborizm", "cpaas" ],
+  "keywords": [
+    "att",
+    "apimarketplace",
+    "kandy",
+    "collaborizm",
+    "cpaas"
+  ],
   "author": "Collaborizm Community",
   "devDependencies": {
     "@types/jsonwebtoken": "^8.3.2",
