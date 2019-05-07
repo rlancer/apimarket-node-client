@@ -271,6 +271,9 @@ class APIMarketplaceClient {
 
     await this.preRequest()
 
+    const fromFormatted= formatPhone(fromAddress)
+    const toFormatted = formatPhone(toAddress)
+
     const channels = await this.getChannels()
 
     let clientCorrelator
@@ -289,7 +292,7 @@ class APIMarketplaceClient {
       })
     }
 
-    this.sendSMS({ clientCorrelator, fromAddress, toAddress, message })
+    this.sendSMS({ clientCorrelator, fromAddress:fromFormatted, toAddress:toFormatted, message })
   }
 }
 
