@@ -6,6 +6,8 @@ AT&T API Marketplace - Community Nodejs Client
 Get started with the new API Marketplace at 
 https://apimarket.att.com
 
+**Clone the examples! https://github.com/rlancer/apimarket-examples**
+
 ## Install 
 `$ npm i @collaborizm/apimarket`
 
