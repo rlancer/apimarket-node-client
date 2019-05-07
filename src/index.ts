@@ -26,7 +26,6 @@ const handleError = (error: any) => {
   }
 }
 
-
 export function formatPhone(phone: string): string {
   const formattedPhone = phone.replace(/[\.\-\s]/g, '')
 
@@ -40,35 +39,34 @@ export function formatPhone(phone: string): string {
         return `+${formattedPhone}`
       }
     }
-
   }
 
   throw 'Invalid phone number'
 }
 
 type TNotificationChannel = {
-  callbackURL: string,
-  channelData:
-    { channelURL: string },
-  channelLifetime: number,
-  channelType: 'websockets' | 'another' | 'other',
-  clientCorrelator: string,
-  resourceURL:
-    string,
+  callbackURL: string
+  channelData: {
+    channelURL: string
+    'x-webhookURL': string
+    'x-authorization': string
+  }
+  channelLifetime: number
+  channelType: 'websockets' | 'another' | 'other'
+  clientCorrelator: string
+  resourceURL: string
   'x-connCheckRole': 'server' | 'client'
 }
 
-type  TGetChannelResponse = {
+type TGetChannelResponse = {
   notificationChannel: TNotificationChannel
 }
-
 
 type TGetChannelsResponse = {
   notificationChannelList: {
     notificationChannel: Array<TNotificationChannel>
   }
 }
-
 
 const BASEURL_WS = 'wss://oauth-cpaas.att.com'
 const BASEURL = 'https://oauth-cpaas.att.com/cpaas'
@@ -112,7 +110,6 @@ type TJWT = {
 type TAuthConfig = TAuthenticateProject | TAuthenticateUser
 
 class APIMarketplaceClient {
-
   private id_token?: string | null
   private access_token?: string | null
   private decodedToken?: TJWT
@@ -127,34 +124,33 @@ class APIMarketplaceClient {
     this.authConfig = config
   }
 
-
   private preRequest() {
     return this.getTokensAndRefreshIfNeeded()
   }
 
   public async getTokensAndRefreshIfNeeded() {
-
     if (this.decodedToken) {
-
-      const timeleft = (this.decodedToken.exp * 1000) - (new Date()).getTime()
-
-//      console.log('time left on token', timeleft)
+      const timeleft = this.decodedToken.exp * 1000 - new Date().getTime()
 
       if (timeleft < 5000) {
         return await this.forceGetTokens()
       } else {
         //      console.log('No need to refresh token')
-        return { id_token: this.id_token, access_token: this.access_token, id_token_decoded: this.decodedToken }
+        return {
+          id_token: this.id_token,
+          access_token: this.access_token,
+          id_token_decoded: this.decodedToken
+        }
       }
-
     } else {
       return await this.forceGetTokens()
     }
   }
 
   public async forceGetTokens() {
-    console.log('forging fetch of new token')
-    this.authResponse = await axios.post('https://oauth-cpaas.att.com/cpaas/auth/v1/token', querystring.stringify(this.authConfig),
+    this.authResponse = await axios.post(
+      'https://oauth-cpaas.att.com/cpaas/auth/v1/token',
+      querystring.stringify(this.authConfig),
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -175,48 +171,94 @@ class APIMarketplaceClient {
   async getInboundSMSSubscriptions() {
     await this.preRequest()
 
-    const resp = await axios.get(`${BASEURL}/smsmessaging/v1/${this.preferred_username}/inbound/subscriptions`, {
-      headers: {
-        Authorization: `Bearer ${this.access_token}`
+    const resp = await axios.get(
+      `${BASEURL}/smsmessaging/v1/${
+        this.preferred_username
+        }/inbound/subscriptions`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.access_token}`
+        }
       }
-    })
+    )
 
     return resp.data
   }
 
   async getSMSHistory() {
-
     await this.preRequest()
 
-
-    const resp = await axios.get(`${BASEURL}/smsmessaging/v1/${this.preferred_username}/remoteAddresses?max=50`, {
-      headers: {
-        Authorization: `Bearer ${this.access_token}`
+    const resp = await axios.get(
+      `${BASEURL}/smsmessaging/v1/${
+        this.preferred_username
+        }/remoteAddresses?max=50`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.access_token}`
+        }
       }
-    })
+    )
 
     return resp.data
   }
 
-  async createChannel({ clientCorrelator, xWebhookURL = '', xAuthorization = '' }: { clientCorrelator: string, xWebhookURL?: string, xAuthorization?: string }) {
+  async deleteChannel({ channel }: { channel: string }) {
+    // - /notificationchannel/v1/{userId}/channels/{channelId}
+
     await this.preRequest()
 
     try {
-      const resp = await axios.post(`${BASEURL}/notificationchannel/v1/${this.preferred_username}/channels`, {
-        'notificationChannel': {
-          channelData: {
-            'x-webhookURL': xWebhookURL,
-            'x-authorization': xAuthorization
-          },
-          'channelType': 'Webhooks',
-          'clientCorrelator': clientCorrelator
+      const resp = await axios.delete(
+        `${BASEURL}/notificationchannel/v1/${
+          this.preferred_username
+          }/channels/${channel}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.access_token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      }, {
-        headers: {
-          Authorization: `Bearer ${this.access_token}`,
-          'Content-Type': 'application/json'
+      )
+
+      const data = resp.data
+      return data
+    } catch (error) {
+      handleError(error)
+      throw error
+    }
+  }
+
+  async createChannel({
+                        clientCorrelator,
+                        xWebhookURL = '',
+                        xAuthorization = ''
+                      }: {
+    clientCorrelator: string
+    xWebhookURL?: string
+    xAuthorization?: string
+  }) {
+    await this.preRequest()
+
+    try {
+      const resp = await axios.post(
+        `${BASEURL}/notificationchannel/v1/${this.preferred_username}/channels`,
+        {
+          notificationChannel: {
+            channelData: {
+              'x-webhookURL': xWebhookURL,
+              'x-authorization': xAuthorization
+            },
+            channelType: 'Webhooks',
+            clientCorrelator: clientCorrelator
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.access_token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      })
+      )
 
       const data: TGetChannelResponse = resp.data
       return data
@@ -226,26 +268,40 @@ class APIMarketplaceClient {
     }
   }
 
-
   async getChannels(): Promise<TGetChannelsResponse> {
     await this.preRequest()
 
-    const resp = await axios.get(`${BASEURL}/notificationchannel/v1/${this.preferred_username}/channels`, {
-      headers: {
-        Authorization: `Bearer ${this.access_token}`
+    const resp = await axios.get(
+      `${BASEURL}/notificationchannel/v1/${this.preferred_username}/channels`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.access_token}`
+        }
       }
-    })
+    )
 
     return resp.data
   }
 
-  async sendSMS({ toAddress, fromAddress, message, clientCorrelator }: { toAddress: string, fromAddress: string, message: string, clientCorrelator: string }) {
+  async sendSMS({
+                  toAddress,
+                  fromAddress,
+                  message,
+                  clientCorrelator
+                }: {
+    toAddress: string
+    fromAddress: string
+    message: string
+    clientCorrelator: string
+  }) {
     await this.preRequest()
 
     try {
-
-      const txt = await axios.post(`${BASEURL}/smsmessaging/v1/${this.preferred_username}/outbound/${fromAddress}/requests`, {
-
+      const txt = await axios.post(
+        `${BASEURL}/smsmessaging/v1/${
+          this.preferred_username
+          }/outbound/${fromAddress}/requests`,
+        {
           outboundSMSMessageRequest: {
             address: [toAddress],
             clientCorrelator: clientCorrelator,
@@ -267,33 +323,53 @@ class APIMarketplaceClient {
     }
   }
 
-  async simpleSmsSend({ toAddress, fromAddress, message, callbackUrl = '' }: { fromAddress: string, toAddress: string, message: string, callbackUrl?: string }) {
-
+  async simpleSmsSend({
+                        toAddress,
+                        fromAddress,
+                        message,
+                        callbackUrl = '',
+                        webhookAuthorizationState = 'defaultxauth'
+                      }: {
+    webhookAuthorizationState?: string
+    fromAddress: string
+    toAddress: string
+    message: string
+    callbackUrl?: string
+  }) {
     await this.preRequest()
 
-    const fromFormatted= formatPhone(fromAddress)
+    const fromFormatted = formatPhone(fromAddress)
     const toFormatted = formatPhone(toAddress)
 
     const channels = await this.getChannels()
 
+    const existingChannel = channels.notificationChannelList.notificationChannel.find(
+      i => i.channelData['x-webhookURL'] === callbackUrl
+    )
+
     let clientCorrelator
 
-    // should see if callbackurl matches
-    if (channels.notificationChannelList.notificationChannel.length > 0) {
-      clientCorrelator = channels.notificationChannelList.notificationChannel[0].clientCorrelator
-
+    if (existingChannel) {
+      clientCorrelator = existingChannel.clientCorrelator
     } else {
       clientCorrelator = shortid.generate()
 
       const createChan = await this.createChannel({
         clientCorrelator: clientCorrelator,
-        xAuthorization: '',
-        xWebhookURL: callbackUrl
+        xWebhookURL: callbackUrl,
+        xAuthorization: webhookAuthorizationState
       })
     }
 
-    this.sendSMS({ clientCorrelator, fromAddress:fromFormatted, toAddress:toFormatted, message })
+    return await this.sendSMS({
+      clientCorrelator,
+      fromAddress: fromFormatted,
+      toAddress: toFormatted,
+      message
+    })
   }
 }
+
+// delete a channel needed
 
 export { APIMarketplaceClient }
